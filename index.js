@@ -1,6 +1,8 @@
 const { default: axios } = require("axios");
 const { config } = require("dotenv");
 const { REST, Routes } = require("discord.js");
+const cheerio = require("cheerio");
+const iconv = require("iconv-lite");
 
 config();
 
@@ -13,6 +15,7 @@ const discordPublicKey = process.env.DISCORD_PUBLIC_KEY;
 const discordToken = process.env.DISCORD_TOKEN;
 
 const twitchUrlPrefix = "https://www.twitch.tv/";
+const clubId = "29424353";
 
 const STREAMERS = {
 	notice: {
@@ -26,6 +29,7 @@ const STREAMERS = {
 		displayName: "아라하시_타비",
 		discordChannelId: "1179630895997669436",
 		color: 0x9adaff,
+		menuId: "152",
 	},
 	kanna: {
 		name: "airikanna_stellive",
@@ -35,6 +39,7 @@ const STREAMERS = {
 		displayName: "아이리_칸나",
 		discordChannelId: "1179630864217407489",
 		color: 0x373584,
+		menuId: "131",
 	},
 };
 
@@ -47,6 +52,7 @@ let access_token = "";
 
 //! Initial Executes
 getToken();
+// getNaverCafeData("tabi");
 
 //! Timers
 const token_timer = setInterval(() => {
@@ -57,6 +63,8 @@ const twitchTimer = setInterval(() => {
 	getStream("tabi");
 	getStream("kanna");
 }, 2000);
+
+const naverTimer = setInterval(() => {}, 30000);
 
 //! Functions
 
@@ -173,4 +181,12 @@ function postErrorMessage(err) {
 			},
 		],
 	});
+}
+
+async function getNaverCafeData(streamer) {
+	const cafeNoticeUrl = `https://cafe.naver.com/ArticleList.nhn?search.clubid=${clubId}&search.menuid=${STREAMERS[streamer].menuId}`;
+	const res = await axios(cafeNoticeUrl, { responseType: "arraybuffer" });
+	const decoded = iconv.decode(res.data, "EUC-KR").toString();
+	const $ = cheerio.load(decoded);
+	console.log($(".article-board:not(#upperArticleList) tbody").html());
 }
