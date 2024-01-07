@@ -15,6 +15,9 @@ const discordToken = process.env.DISCORD_TOKEN;
 const twitchUrlPrefix = "https://www.twitch.tv/";
 
 const STREAMERS = {
+	notice: {
+		discordChannelId: "1179630290596012096",
+	},
 	tabi: {
 		name: "arahashitabi_stellive",
 		live: undefined,
@@ -58,29 +61,39 @@ const twitchTimer = setInterval(() => {
 //! Functions
 
 function getToken() {
-	axios
-		.post(
-			"https://id.twitch.tv/oauth2/token",
-			{
-				client_id: twitchClientId,
-				client_secret: twitchClientSecret,
-				grant_type: "client_credentials",
-			},
-			{ headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-		)
-		.then((res) => {
-			access_token = res.data.access_token;
-		});
+	try {
+		axios
+			.post(
+				"https://id.twitch.tv/oauth2/token",
+				{
+					client_id: twitchClientId,
+					client_secret: twitchClientSecret,
+					grant_type: "client_credentials",
+				},
+				{ headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+			)
+			.then((res) => {
+				access_token = res.data.access_token;
+			});
+	} catch (err) {
+		console.log(err);
+		postErrorMessage(err);
+	}
 }
 
 function getStream(streamer) {
-	axios
-		.get(`https://api.twitch.tv/helix/streams?user_login=${STREAMERS[streamer].name}`, {
-			headers: { Authorization: `Bearer ${access_token}`, "Client-Id": twitchClientId },
-		})
-		.then((res) => {
-			handleTwitchData(res.data.data[0], streamer);
-		});
+	try {
+		axios
+			.get(`https://api.twitch.tv/helix/streams?user_login=${STREAMERS[streamer].name}`, {
+				headers: { Authorization: `Bearer ${access_token}`, "Client-Id": twitchClientId },
+			})
+			.then((res) => {
+				handleTwitchData(res.data.data[0], streamer);
+			});
+	} catch (err) {
+		console.log(err);
+		postErrorMessage(err);
+	}
 }
 
 async function handleTwitchData(data, streamer) {
@@ -90,44 +103,47 @@ async function handleTwitchData(data, streamer) {
 		STREAMERS[streamer].title = undefined;
 	} else {
 		const { user_id, type, title, started_at } = data;
-		if (!STREAMERS[streamer].live) {
+		if (STREAMERS[streamer].live === false) {
 			// 생방 on!
 			const userInfo = await getUserInfo(user_id);
 			const thumbnail_url = userInfo.data.data[0].profile_image_url;
 
-			postMessage(streamer, {
-				embeds: [
-					{
-						type: "rich",
-						author: {
-							name: STREAMERS[streamer].displayName,
+			postMessage(
+				streamer,
+				{
+					embeds: [
+						{
+							type: "rich",
+							author: {
+								name: STREAMERS[streamer].displayName,
+								url: `${twitchUrlPrefix}${STREAMERS[streamer].name}`,
+								icon_url: thumbnail_url,
+							},
+							title: `${STREAMERS[streamer].displayName} 방송 ON!`,
 							url: `${twitchUrlPrefix}${STREAMERS[streamer].name}`,
-							icon_url: thumbnail_url,
+							description: title,
+							footer: {
+								text: "Twitch",
+								icon_url: "https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png",
+							},
+							thumbnail: { url: thumbnail_url },
+							timestamp: started_at,
+							color: 0x6441a5,
 						},
-						title: `${STREAMERS[streamer].displayName} 방송 ON!`,
-						url: `${twitchUrlPrefix}${STREAMERS[streamer].name}`,
-						description: title,
-						footer: {
-							text: "Twitch",
-							icon_url: "https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png",
-						},
-						thumbnail: { url: thumbnail_url },
-						timestamp: started_at,
-						color: 0x6441a5,
-					},
-				],
-			});
+					],
+				},
+				`${STREAMERS[streamer].displayName} 방송 ON 메시지 전송 성공!`
+			);
 		}
-		// console.log(data);
 		STREAMERS[streamer].live = true;
 		STREAMERS[streamer].type = type;
 		STREAMERS[streamer].title = title;
 	}
 }
 
-function postMessage(streamer, body) {
+function postMessage(streamer, body, msg) {
 	rest.post(Routes.channelMessages(STREAMERS[streamer].discordChannelId), { body }).then((res) => {
-		console.log(`${STREAMERS[streamer].displayName} 방송 ON 메시지 전송 성공!`);
+		msg && console.log(msg);
 	});
 }
 
@@ -139,4 +155,22 @@ async function getUserInfo(user_id) {
 
 function modImageUrl(url) {
 	return url.replace(/{width}|{height}/g, 300);
+}
+
+function postErrorMessage(err) {
+	postMessage("notice", {
+		embeds: [
+			{
+				type: "rich",
+				author: {
+					name: "CloudType Server",
+				},
+				title: `에러 발생 알림`,
+				// url: `${twitchUrlPrefix}${STREAMERS[streamer].name}`,
+				description: err,
+				timestamp: new Date(),
+				color: 0xd1180b,
+			},
+		],
+	});
 }
