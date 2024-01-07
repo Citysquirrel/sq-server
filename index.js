@@ -3,8 +3,31 @@ const { config } = require("dotenv");
 const { REST, Routes } = require("discord.js");
 const cheerio = require("cheerio");
 const iconv = require("iconv-lite");
+const express = require("express");
+const helmet = require("helmet");
 
+//! App
+const app = express();
+app.use(helmet());
 config();
+
+app.get("/", (req, res) => {
+	console.log("Health Checked");
+	return res.send("Hello! I'm Healthy!");
+});
+
+app.get("/*", (req, res) => {
+	return res.status(404).send(`Cannot GET ${req.originalUrl} :(`);
+});
+
+app
+	.listen(3000, () => {
+		console.log(`Server is running in 3000 port.`);
+	})
+	.on("error", (err) => {
+		console.log(`Error occured when server opening!
+>>> ${err.stack}`);
+	});
 
 //! Constants
 const twitchClientId = process.env.TWITCH_CLIENT_ID;
