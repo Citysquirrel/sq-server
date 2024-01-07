@@ -1,7 +1,6 @@
 const { default: axios } = require("axios");
 const { config } = require("dotenv");
-const { REST, Routes, ChannelManager, Embed } = require("discord.js");
-const { EmbedBuilder } = require("@discordjs/builders");
+const { REST, Routes } = require("discord.js");
 
 config();
 
@@ -36,11 +35,6 @@ const STREAMERS = {
 	},
 };
 
-const DISCORD = {
-	tabi: { channelId: "1179630895997669436" },
-	kanna: { channelId: "1179630864217407489" },
-};
-
 //! Configs
 
 const rest = new REST({ version: "10" }).setToken(discordToken);
@@ -56,19 +50,13 @@ const token_timer = setInterval(() => {
 	getToken();
 }, 40000);
 
-const tabiTwitchTimer = setInterval(() => {
+const twitchTimer = setInterval(() => {
 	getStream("tabi");
 	getStream("kanna");
 }, 2000);
 
 //! Functions
-const embed = new EmbedBuilder({
-	type: "rich",
-	author: { name: STREAMERS.tabi.displayName, url: `${twitchUrlPrefix}${STREAMERS.tabi.name}` },
-	title: { text: `${STREAMERS.tabi.displayName} 방송 ON!`, url: `${twitchUrlPrefix}${STREAMERS.tabi.name}` },
-	description: "방송제목",
-	// footer:""
-});
+
 function getToken() {
 	axios
 		.post(
