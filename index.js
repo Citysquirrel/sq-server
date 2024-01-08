@@ -182,7 +182,7 @@ async function handleTwitchData(data, streamer) {
 
 function postMessage(streamer, body, msg) {
 	rest.post(Routes.channelMessages(STREAMERS[streamer].discordChannelId), { body }).then((res) => {
-		msg && console.log(msg);
+		msg && messageCollector(msg);
 	});
 }
 
