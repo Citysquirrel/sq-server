@@ -5,6 +5,7 @@ const cheerio = require("cheerio");
 const iconv = require("iconv-lite");
 const express = require("express");
 const helmet = require("helmet");
+const { messageCollector, messageStorage } = require("./msg");
 
 //! App
 const app = express();
@@ -12,7 +13,7 @@ app.use(helmet());
 config();
 
 app.get("/", (req, res) => {
-	console.log("Health Checked");
+	messageCollector("Health Checked");
 	return res.send("Hello! I'm Healthy!");
 });
 
@@ -78,6 +79,13 @@ getToken();
 // getNaverCafeData("tabi");
 
 //! Timers
+const messageCollectorTimer = setInterval(() => {
+	messageStorage.forEach((val, key) => {
+		console.log(`[${new Date().toLocaleString()}]: ${key} (x${val})`);
+	});
+	messageStorage.clear();
+}, 5000);
+
 const token_timer = setInterval(() => {
 	getToken();
 }, 40000);
