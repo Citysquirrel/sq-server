@@ -7,6 +7,13 @@ const express = require("express");
 const helmet = require("helmet");
 const { messageCollector, messageStorage } = require("./msg");
 
+//TODO: 느낌표 주석으로 나누어진 요소들 각 파일 및 디렉터리로 구분해 분리
+//TODO: 치지직 라이브 알람
+//TODO: 방송 종료시에도 알림?
+//TODO: 트위터 글작성 알림
+//TODO: 네이버 공지 작성 알림
+//TODO: 유튜브 알림
+
 //! App
 const app = express();
 app.use(helmet());
@@ -39,6 +46,9 @@ const discordPublicKey = process.env.DISCORD_PUBLIC_KEY;
 const discordToken = process.env.DISCORD_TOKEN;
 
 const twitchUrlPrefix = "https://www.twitch.tv/";
+const chzzkUrlPrefix = "https://chzzk.naver.com/live/";
+// 치지직 라이브 알림용 api: https://api.chzzk.naver.com/service/v2/channels/{channel_id}/live-detail
+
 const clubId = "29424353";
 
 const STREAMERS = {
@@ -90,12 +100,15 @@ const token_timer = setInterval(() => {
 	getToken();
 }, 40000);
 
+// 스트림 정보 가져오기
 const twitchTimer = setInterval(() => {
 	getStream("tabi");
 	getStream("kanna");
 }, 2000);
 
-const naverTimer = setInterval(() => {}, 30000);
+const chzzkTimer = setInterval(() => {
+	getStream("tabi");
+}, 2000);
 
 //! Functions
 
@@ -129,6 +142,14 @@ function getStream(streamer) {
 			.then((res) => {
 				handleTwitchData(res.data.data[0], streamer);
 			});
+	} catch (err) {
+		console.log(err);
+		postErrorMessage(err);
+	}
+}
+
+function getChzzkLive(streamer) {
+	try {
 	} catch (err) {
 		console.log(err);
 		postErrorMessage(err);
