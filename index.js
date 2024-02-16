@@ -179,7 +179,7 @@ function getChzzkStream(streamer) {
 }
 
 async function handleChzzkData(data, streamer) {
-	const { channel, status, liveTitle, openData, closeData } = data;
+	const { channel, status, liveTitle, openData, closeData } = data.content;
 	const { channelName, channelImageUrl } = channel;
 	if (STREAMERS[streamer].chzzk.status === undefined) {
 		//? 서버 실행 후 최초 실행
