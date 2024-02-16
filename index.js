@@ -7,6 +7,7 @@ const express = require("express");
 const helmet = require("helmet");
 const { messageCollector, messageStorage } = require("./msg");
 
+//?Suggestion:
 //TODO: 느낌표 주석으로 나누어진 요소들 각 파일 및 디렉터리로 구분해 분리
 //TODO: 치지직 라이브 알람
 //TODO: 방송 종료시에도 알림?
@@ -33,7 +34,7 @@ app
 		console.log(`Server is running in 3000 port.`);
 	})
 	.on("error", (err) => {
-		console.log(`Error occured when server opening!
+		console.log(`An error occurred during server opening!
 >>> ${err.stack}`);
 	});
 
