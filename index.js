@@ -5,6 +5,7 @@ const helmet = require("helmet");
 const { messageCollector, messageStorage } = require("./lib/tools/messageStorage");
 const { STREAMERS } = require("./lib/data");
 const { getChzzkStream } = require("./lib/platform/naver");
+const { getYoutubeChannel } = require("./lib/platform/youtube");
 
 //?Suggestion:
 //TODO: 느낌표 주석으로 나누어진 요소들 각 파일 및 디렉터리로 구분해 분리
@@ -19,7 +20,11 @@ const app = express();
 app.use(helmet());
 config();
 
-app.get("/", (req, res) => {
+// app.get('/', (req,res) => {
+// 	res.writeHead(301, {"location": })
+// })
+
+app.get("/health", (req, res) => {
 	messageCollector("Health Checked");
 	return res.send("Hello! I'm Healthy!");
 });
@@ -72,6 +77,10 @@ const twitchTimer = setInterval(() => {
 const chzzkTimer = setInterval(() => {
 	getChzzkStream("tabi");
 }, 2000);
+
+// const youtubeTimer = setInterval(() => {
+// 	getYoutubeChannel("arahashitabi");
+// }, 10000);
 
 //! Functions
 
