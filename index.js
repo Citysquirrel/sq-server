@@ -179,7 +179,6 @@ function getChzzkStream(streamer) {
 }
 
 async function handleChzzkData(data, streamer) {
-	console.log(data);
 	const { channel, status, liveTitle, openData, closeData } = data;
 	const { channelName, channelImageUrl } = channel;
 	if (STREAMERS[streamer].chzzk.status === undefined) {
