@@ -46,6 +46,7 @@ const discordPublicKey = process.env.DISCORD_PUBLIC_KEY;
 const discordToken = process.env.DISCORD_TOKEN;
 
 const twitchUrlPrefix = "https://www.twitch.tv/";
+const chzzkColorCode = 0x00ffa3;
 const chzzkLivePrefix = "https://chzzk.naver.com/live/";
 const chzzkLiveAPI = (channelId) => `https://api.chzzk.naver.com/service/v2/channels/${channelId}/live-detail`;
 
@@ -221,7 +222,7 @@ async function handleChzzkData(data, streamer) {
 								},
 								thumbnail: { url: STREAMERS[streamer].chzzk.channelImageUrl },
 								timestamp: openData,
-								color: 0x6441a5,
+								color: chzzkColorCode,
 							},
 						],
 					},
@@ -249,7 +250,7 @@ async function handleChzzkData(data, streamer) {
 								},
 								thumbnail: { url: STREAMERS[streamer].chzzk.channelImageUrl },
 								timestamp: closeData,
-								color: 0x6441a5,
+								color: chzzkColorCode,
 							},
 						],
 					},
@@ -281,7 +282,7 @@ async function handleChzzkData(data, streamer) {
 								},
 								thumbnail: { url: STREAMERS[streamer].chzzk.channelImageUrl },
 								timestamp: new Date(),
-								color: 0x6441a5,
+								color: chzzkColorCode,
 							},
 						],
 					},
